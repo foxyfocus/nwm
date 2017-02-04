@@ -33,7 +33,7 @@ int main (int argc, char *argv[])
   }
   
   //addConnection(NM_CLIENT(client),"Moussa");
-  
+  activateConnection(client,connections->pdata[4]);
   g_object_unref (client);
 
   return 0;
@@ -44,21 +44,22 @@ void activateConnection(NMClient *client,NMConnection *connection)
   NMDevice *device;
   NMAccessPoint *point;
   device = nm_client_get_device_by_iface(client,"wlp4s0");
-  nm_client_activate_connection_async(client,connection,device, NULL,NULL,added_connection,NULL);
+
+  nm_client_activate_connection_async(client,connection,device, NULL,NULL,activated_connection,NULL);
 }
 
 static void activated_connection(GObject *client,GAsyncResult *result,gpointer user_data)
 {
-  NMRemoteConnection *remote;
+  NMActiveConnection *remote;
   GError *error = NULL;
-
-  remote = nm_client_add_connection_finish (NM_CLIENT (client), result, &error);
+    printf("hehexd?\n");
+  remote = nm_client_activate_connection_finish (NM_CLIENT (client), result, &error);
 
   if (error) {
     g_print ("Error adding connection: %s", error->message);
     g_error_free (error);
   } else {
-    g_print ("Added: %s\n", nm_connection_get_path (NM_CONNECTION (remote)));
+    g_print ("Connected: %s\n", nm_connection_get_path (NM_CONNECTION (remote)));
     g_object_unref (remote);
   } 
 }
